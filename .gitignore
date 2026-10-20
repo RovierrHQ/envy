@@ -1,0 +1,21 @@
+# Local envy state & mock data
+.envy/
+*.env
+.env.*
+!.env.example
+
+# Build
+/bin/
+/dist/
+*.exe
+
+# Go
+coverage.out
+*.test
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.cursor/
