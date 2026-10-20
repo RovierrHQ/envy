@@ -1,23 +1,40 @@
 package cli
 
 import (
+	"context"
 	"fmt"
+	"os"
 
+	"github.com/RovierrHQ/envy/internal/api"
 	"github.com/RovierrHQ/envy/internal/keyring"
 	"github.com/spf13/cobra"
 )
 
 func newLoginCmd() *cobra.Command {
-	return &cobra.Command{
+	var tokenFlag, apiURL string
+	cmd := &cobra.Command{
 		Use:   "login",
-		Short: "Save an API bearer token in the OS credential store",
+		Short: "Store an API token via device login or --token",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			token, err := promptSecret("API token: ")
-			if err != nil {
-				return err
+			if apiURL == "" {
+				apiURL = api.DefaultAPIURL
+			}
+			token := tokenFlag
+			if token == "" {
+				if v := getenvToken(); v != "" {
+					token = v
+				}
 			}
 			if token == "" {
-				return fmt.Errorf("token required")
+				start, err := api.StartDevice(context.Background(), apiURL)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Open %s\nCode: %s\n", start.VerificationURI, start.UserCode)
+				token, err = api.WaitForDevice(context.Background(), apiURL, start)
+				if err != nil {
+					return err
+				}
 			}
 			if err := keyring.SetAuthToken(token); err != nil {
 				return err
@@ -26,4 +43,11 @@ func newLoginCmd() *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().StringVar(&tokenFlag, "token", "", "paste a PAT from /settings/tokens")
+	cmd.Flags().StringVar(&apiURL, "api-url", "", "API origin (default "+api.DefaultAPIURL+")")
+	return cmd
+}
+
+func getenvToken() string {
+	return os.Getenv("ENVY_API_TOKEN")
 }

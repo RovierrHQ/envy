@@ -5,7 +5,7 @@ Encrypt locally, store ciphertext only, share a project passphrase out-of-band.
 
 ## Status
 
-v0 — CLI plus mock/file backend. The HTTP `/v1` contract is frozen; the Cloudflare Worker is not in this repository yet.
+v0 — CLI talks to [envy-api](https://github.com/RovierrHQ/envy-api) (`https://envy-api.rovierr.workers.dev` once deployed). `--backend=mock` stays for offline tests. Custom domain `envy.rovierr.com` waits until that zone is on the Cloudflare account.
 
 ## Install
 
@@ -58,10 +58,13 @@ Teammates clone the repo (which includes committed `.envy.json`), run `envy unlo
 | Command | Purpose |
 | --- | --- |
 | `envy init` | Create `.envy.json`, derive key, optionally register a project |
-| `envy login` | Store API bearer token in the OS keyring |
+| `envy login` | Device login, or `envy login --token` with a PAT from `/settings/tokens` |
+| `envy logout` | Remove the API token from the OS keyring |
 | `envy unlock` | Derive project key from passphrase into the OS keyring |
 | `envy push --env <name>` | Encrypt local file and upload |
 | `envy pull --env <name>` | Download, decrypt, atomic write (use `--force` if dirty) |
+| `envy invite create --role read\|write` | Owner mints a 48h single-use invite |
+| `envy invite accept <code>` | Join a project (login first) |
 
 Global flag: `--backend=mock|http` (default mock when `api_url` is empty).
 
@@ -71,6 +74,10 @@ Global flag: `--backend=mock|http` (default mock when `api_url` is empty).
 POST /v1/projects
 PUT  /v1/projects/{id}/secrets/{env}   body: { ciphertext, version }  # version = client's base
 GET  /v1/projects/{id}/secrets/{env}   → { ciphertext, version }
+POST /v1/projects/{id}/invites         body: { role }
+POST /v1/invites/accept                body: { code }
+POST /v1/device/code
+POST /v1/device/token
 ```
 
 `Authorization: Bearer <token>`. `409` on version conflict.

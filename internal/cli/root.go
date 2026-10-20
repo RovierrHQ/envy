@@ -23,9 +23,11 @@ func NewRoot() *cobra.Command {
 	root.PersistentFlags().StringVar(&flagBackend, "backend", "", "storage backend: mock|http (default: mock if api_url empty, else http)")
 	root.AddCommand(newInitCmd())
 	root.AddCommand(newLoginCmd())
+	root.AddCommand(newLogoutCmd())
 	root.AddCommand(newUnlockCmd())
 	root.AddCommand(newPushCmd())
 	root.AddCommand(newPullCmd())
+	root.AddCommand(newInviteCmd())
 	return root
 }
 
