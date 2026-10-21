@@ -5,7 +5,7 @@ Encrypt locally, store ciphertext only, share a project passphrase out-of-band.
 
 ## Status
 
-v0 — CLI talks to [envy-api](https://github.com/RovierrHQ/envy-api) (`https://envy-api.rovierr.workers.dev` once deployed). `--backend=mock` stays for offline tests. Custom domain `envy.rovierr.com` waits until that zone is on the Cloudflare account.
+v0.1 — Hosted API: https://envy-api.rovierr.workers.dev. The CLI is open source. Self-host [envy-api](https://github.com/RovierrHQ/envy-api) when you want your own Cloudflare account. `--backend=mock` stays for offline tests.
 
 ## Install
 
