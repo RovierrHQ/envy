@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/RovierrHQ/envy/internal/api"
 	"github.com/RovierrHQ/envy/internal/config"
 	"github.com/RovierrHQ/envy/internal/crypto"
 	"github.com/RovierrHQ/envy/internal/keyring"
@@ -53,6 +54,10 @@ func newInitCmd() *cobra.Command {
 			}
 			key := crypto.DeriveKey(pass, salt)
 
+			if flagBackend != "mock" && apiURL == "" {
+				apiURL = api.DefaultAPIURL
+			}
+
 			cfg := &config.Config{
 				ProjectID:   projectID,
 				APIURL:      apiURL,
@@ -67,7 +72,7 @@ func newInitCmd() *cobra.Command {
 			}
 
 			if cfg.ProjectID == "" {
-				if register || flagBackend == "mock" || cfg.APIURL == "" {
+				if register || flagBackend == "mock" || cfg.APIURL != "" {
 					id, err := backend.CreateProject(context.Background())
 					if err != nil {
 						fmt.Fprintf(os.Stderr, "warning: could not register project (%v); generating local id\n", err)
@@ -90,7 +95,7 @@ func newInitCmd() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&apiURL, "api-url", "", "remote API base URL")
+	cmd.Flags().StringVar(&apiURL, "api-url", "", "remote API base URL (default "+api.DefaultAPIURL+"; empty with --backend=mock)")
 	cmd.Flags().StringVar(&projectID, "project-id", "", "existing project id")
 	cmd.Flags().BoolVar(&register, "register", false, "POST /v1/projects to allocate a project_id")
 	return cmd
