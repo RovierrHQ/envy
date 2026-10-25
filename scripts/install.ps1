@@ -31,7 +31,17 @@ $ver = $tag.TrimStart('v')
 $asset = "envy_${ver}_windows_amd64.zip"
 $base = "https://github.com/$Repo/releases/download/$tag"
 
-Write-Host "Installing envy $tag (windows/amd64) -> $InstallDir"
+$dest = Join-Path $InstallDir 'envy.exe'
+$oldVer = $null
+if (Test-Path $dest) {
+    try { $oldVer = (& $dest version 2>$null).Trim() } catch { $oldVer = $null }
+}
+
+if ($oldVer) {
+    Write-Host "Upgrading envy $oldVer -> $tag (windows/amd64) -> $InstallDir"
+} else {
+    Write-Host "Installing envy $tag (windows/amd64) -> $InstallDir"
+}
 
 $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("envy-install-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $tmp | Out-Null
@@ -64,7 +74,7 @@ try {
     }
 
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-    Copy-Item -Path $bin -Destination (Join-Path $InstallDir 'envy.exe') -Force
+    Copy-Item -Path $bin -Destination $dest -Force
 
     if (-not $NoPath) {
         $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
@@ -80,8 +90,15 @@ try {
         }
     }
 
-    Write-Host "Installed $(Join-Path $InstallDir 'envy.exe')"
+    $newVer = $ver
+    try { $newVer = (& $dest version 2>$null).Trim() } catch { }
+    if ($oldVer) {
+        Write-Host "Upgraded $dest ($oldVer -> $newVer)"
+    } else {
+        Write-Host "Installed $dest ($newVer)"
+    }
     Write-Host 'Done. Open a new terminal if envy is not found on PATH.'
+    Write-Host 'Upgrade anytime by re-running this script. Uninstall: scripts/uninstall.ps1'
 }
 finally {
     Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue

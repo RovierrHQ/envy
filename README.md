@@ -27,6 +27,18 @@ Pin a version: `ENVY_VERSION=v0.2.0` (Unix) or `$env:ENVY_VERSION = 'v0.2.0'` (W
 
 Gatekeeper (macOS) or SmartScreen (Windows) may warn on **manual** downloads from Releases — prefer the install script.
 
+**Upgrade** — re-run the install one-liner (overwrites the binary; prints old → new when `envy version` is available).
+
+**Uninstall**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/uninstall.sh | sh
+```
+
+```powershell
+irm https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/uninstall.ps1 | iex
+```
+
 ### From source
 
 ```bash
@@ -100,6 +112,7 @@ Store the passphrase out-of-band. If it is lost and no teammate still has the de
 | `envy pull --env <name>` | Download, decrypt, atomic write (use `--force` if dirty) |
 | `envy invite create --role read\|write` | Owner mints a 48h single-use invite |
 | `envy invite accept <code>` | Join a project (login first) |
+| `envy version` | Print CLI version |
 
 Global flag: `--backend=mock|http` (default http when `api_url` is set; mock when empty / `--backend=mock`).
 
