@@ -32,6 +32,10 @@ func NewRoot() *cobra.Command {
 }
 
 func Execute() {
+	if shouldShowLaunchHelp() {
+		showLaunchHelp()
+		return
+	}
 	if err := NewRoot().Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
