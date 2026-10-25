@@ -5,15 +5,35 @@ Encrypt locally, store ciphertext only, share a project passphrase out-of-band.
 
 ## Status
 
-v0.1 — Hosted API: https://envy-api.rovierr.workers.dev. The CLI is open source. Self-host [envy-api](https://github.com/RovierrHQ/envy-api) when you want your own Cloudflare account. `--backend=mock` stays for offline tests.
+v0.2 — Hosted API: https://envy-api.rovierr.workers.dev. The CLI is open source. Self-host [envy-api](https://github.com/RovierrHQ/envy-api) when you want your own Cloudflare account. `--backend=mock` stays for offline tests.
 
 ## Install
+
+**macOS / Linux**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/install.sh | sh
+```
+
+**Windows (PowerShell)**
+
+```powershell
+irm https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/install.ps1 | iex
+```
+
+The script downloads the latest GitHub Release, verifies `checksums.txt`, installs into `~/.local/bin` (Unix) or `%LOCALAPPDATA%\envy\bin` (Windows), and adds that directory to your user PATH. Open a **new** terminal afterward.
+
+Pin a version: `ENVY_VERSION=v0.2.0` (Unix) or `$env:ENVY_VERSION = 'v0.2.0'` (Windows). Skip PATH changes with `--no-path` / `-NoPath`.
+
+Gatekeeper (macOS) or SmartScreen (Windows) may warn on **manual** downloads from Releases — prefer the install script. Code signing comes later.
+
+### From source
 
 ```bash
 go install github.com/RovierrHQ/envy/cmd/envy@latest
 ```
 
-Or build from source:
+Or:
 
 ```bash
 git clone https://github.com/RovierrHQ/envy.git
@@ -41,7 +61,7 @@ envy --backend=mock pull --env dev
 cat .env
 ```
 
-Teammates clone the repo (which includes committed `.envy.json`), run `envy unlock` with the shared passphrase, then `envy pull`.
+Teammates clone the repo (which includes committed `.envy.json`), run `envy unlock` with the shared passphrase, then `envy pull`. Store the passphrase out-of-band (e.g. 1Password); if it is lost and no teammate still has the derived key in their OS keyring, remote ciphertext cannot be decrypted.
 
 ## How it works
 
