@@ -80,7 +80,16 @@ base="https://github.com/${REPO}/releases/download/${tag}"
 tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
-echo "Installing envy ${tag} (${os}/${arch}) -> ${INSTALL_DIR}"
+old_ver=""
+if [ -x "${INSTALL_DIR}/envy" ]; then
+  old_ver=$("${INSTALL_DIR}/envy" version 2>/dev/null || true)
+fi
+
+if [ -n "$old_ver" ]; then
+  echo "Upgrading envy ${old_ver} -> ${tag} (${os}/${arch}) -> ${INSTALL_DIR}"
+else
+  echo "Installing envy ${tag} (${os}/${arch}) -> ${INSTALL_DIR}"
+fi
 
 curl -fsSL "${base}/${asset}" -o "${tmpdir}/${asset}"
 curl -fsSL "${base}/checksums.txt" -o "${tmpdir}/checksums.txt"
@@ -169,6 +178,11 @@ if [ "$NO_PATH" -eq 0 ]; then
   esac
 fi
 
-echo "Installed ${INSTALL_DIR}/envy"
-"${INSTALL_DIR}/envy" --help >/dev/null 2>&1 || true
+new_ver=$("${INSTALL_DIR}/envy" version 2>/dev/null || echo "$ver")
+if [ -n "$old_ver" ]; then
+  echo "Upgraded ${INSTALL_DIR}/envy (${old_ver} -> ${new_ver})"
+else
+  echo "Installed ${INSTALL_DIR}/envy (${new_ver})"
+fi
 echo "Done. Open a new terminal (or re-source your shell profile) if envy is not found."
+echo "Upgrade anytime by re-running this script. Uninstall: scripts/uninstall.sh"

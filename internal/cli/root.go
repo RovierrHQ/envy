@@ -28,6 +28,9 @@ func NewRoot() *cobra.Command {
 	root.AddCommand(newPushCmd())
 	root.AddCommand(newPullCmd())
 	root.AddCommand(newInviteCmd())
+	root.AddCommand(newVersionCmd())
+	root.Version = Version
+	root.SetVersionTemplate("{{.Version}}\n")
 	return root
 }
 
