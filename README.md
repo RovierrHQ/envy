@@ -22,7 +22,14 @@ brew install envy
 curl -fsSL https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/install.sh | sh
 ```
 
-**Windows (PowerShell)**
+**Windows (Scoop)**
+
+```powershell
+scoop bucket add envy https://github.com/RovierrHQ/scoop-envy
+scoop install envy
+```
+
+**Windows (script)**
 
 ```powershell
 irm https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/install.ps1 | iex
