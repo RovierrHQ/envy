@@ -9,7 +9,14 @@ v0.2 — Hosted API: https://envy-api.rovierr.workers.dev. The CLI is open sourc
 
 ## Install
 
-**macOS / Linux**
+**macOS / Linux (Homebrew)**
+
+```bash
+brew tap RovierrHQ/envy
+brew install envy
+```
+
+**macOS / Linux (script)**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/install.sh | sh
