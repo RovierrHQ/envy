@@ -5,7 +5,7 @@ Encrypt locally, store ciphertext only, share a project passphrase out-of-band.
 
 ## Status
 
-v0.2 — Hosted API: https://envy-api.rovierr.workers.dev. The CLI is open source. Self-host [envy-api](https://github.com/RovierrHQ/envy-api) when you want your own Cloudflare account. `--backend=mock` stays for offline tests.
+v0.2 — Hosted API: https://envy-api.rovierr.workers.dev. The CLI is open source. Self-host [envy-api](https://github.com/RovierrHQ/envy-api) when you want your own Cloudflare account. `--backend=mock` is for offline tests only.
 
 ## Install
 
@@ -25,7 +25,7 @@ The script downloads the latest GitHub Release, verifies `checksums.txt`, instal
 
 Pin a version: `ENVY_VERSION=v0.2.0` (Unix) or `$env:ENVY_VERSION = 'v0.2.0'` (Windows). Skip PATH changes with `--no-path` / `-NoPath`.
 
-Gatekeeper (macOS) or SmartScreen (Windows) may warn on **manual** downloads from Releases — prefer the install script. Code signing comes later.
+Gatekeeper (macOS) or SmartScreen (Windows) may warn on **manual** downloads from Releases — prefer the install script.
 
 ### From source
 
@@ -49,19 +49,34 @@ make cross
 
 ## Quick start
 
+Owner (hosted API):
+
 ```bash
+envy login
 # Interactive passphrase prompts, or set ENVY_PASSPHRASE for non-interactive use
-envy --backend=mock init
+envy init
 
 printf 'FOO=hello\nBAR=world\n' > .env
-envy --backend=mock push --env dev
+envy push --env dev
 
-rm .env
-envy --backend=mock pull --env dev
-cat .env
+envy invite create --role write
+# share the invite code + project passphrase out-of-band (e.g. 1Password)
 ```
 
-Teammates clone the repo (which includes committed `.envy.json`), run `envy unlock` with the shared passphrase, then `envy pull`. Store the passphrase out-of-band (e.g. 1Password); if it is lost and no teammate still has the derived key in their OS keyring, remote ciphertext cannot be decrypted.
+`envy init` defaults `api_url` to the hosted API and registers a project. Use `--backend=mock` only for offline tests.
+
+Teammate:
+
+```bash
+# install envy (see Install), then:
+envy login
+envy invite accept <code>
+# clone the repo (committed .envy.json), then:
+envy unlock
+envy pull --env dev
+```
+
+Store the passphrase out-of-band. If it is lost and no teammate still has the derived key in their OS keyring, remote ciphertext cannot be decrypted.
 
 ## How it works
 
@@ -77,7 +92,7 @@ Teammates clone the repo (which includes committed `.envy.json`), run `envy unlo
 
 | Command | Purpose |
 | --- | --- |
-| `envy init` | Create `.envy.json`, derive key, optionally register a project |
+| `envy init` | Create `.envy.json`, derive key, register project on hosted API |
 | `envy login` | Device login, or `envy login --token` with a PAT from `/settings/tokens` |
 | `envy logout` | Remove the API token from the OS keyring |
 | `envy unlock` | Derive project key from passphrase into the OS keyring |
@@ -86,7 +101,7 @@ Teammates clone the repo (which includes committed `.envy.json`), run `envy unlo
 | `envy invite create --role read\|write` | Owner mints a 48h single-use invite |
 | `envy invite accept <code>` | Join a project (login first) |
 
-Global flag: `--backend=mock|http` (default mock when `api_url` is empty).
+Global flag: `--backend=mock|http` (default http when `api_url` is set; mock when empty / `--backend=mock`).
 
 ## API contract
 
@@ -103,6 +118,14 @@ POST /v1/device/token
 `Authorization: Bearer <token>`. `409` on version conflict.
 
 ## Development
+
+Offline mock backend:
+
+```bash
+envy --backend=mock init
+envy --backend=mock push --env dev
+envy --backend=mock pull --env dev
+```
 
 ```bash
 go test ./...
