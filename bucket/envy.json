@@ -1,0 +1,27 @@
+{
+  "version": "0.2.1",
+  "description": "End-to-end encrypted .env sync for developer teams",
+  "homepage": "https://github.com/RovierrHQ/envy",
+  "license": "MIT",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/RovierrHQ/envy/releases/download/v0.2.1/envy_0.2.1_windows_amd64.zip",
+      "hash": "9b27ae3feb09eef917d52fd2d1c856f1fc4df86d8b89b56e879963a95c56fdb8"
+    }
+  },
+  "bin": "envy.exe",
+  "checkver": {
+    "github": "https://github.com/RovierrHQ/envy"
+  },
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/RovierrHQ/envy/releases/download/v$version/envy_$version_windows_amd64.zip"
+      }
+    },
+    "hash": {
+      "url": "https://github.com/RovierrHQ/envy/releases/download/v$version/checksums.txt",
+      "regex": "$sha256\\s+envy_$version_windows_amd64\\.zip"
+    }
+  }
+}

@@ -12,7 +12,7 @@ v0.2 — Hosted API: https://envy-api.rovierr.workers.dev. The CLI is open sourc
 **macOS / Linux (Homebrew)**
 
 ```bash
-brew tap RovierrHQ/envy
+brew tap RovierrHQ/envy https://github.com/RovierrHQ/envy
 brew install envy
 ```
 
@@ -25,7 +25,7 @@ curl -fsSL https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/install
 **Windows (Scoop)**
 
 ```powershell
-scoop bucket add envy https://github.com/RovierrHQ/scoop-envy
+scoop bucket add envy https://github.com/RovierrHQ/envy
 scoop install envy
 ```
 
@@ -34,6 +34,8 @@ scoop install envy
 ```powershell
 irm https://raw.githubusercontent.com/RovierrHQ/envy/main/scripts/install.ps1 | iex
 ```
+
+Homebrew formula: [`Formula/envy.rb`](Formula/envy.rb). Scoop manifest: [`bucket/envy.json`](bucket/envy.json). Bump version/url/hash there when cutting a release.
 
 The script downloads the latest GitHub Release, verifies `checksums.txt`, installs into `~/.local/bin` (Unix) or `%LOCALAPPDATA%\envy\bin` (Windows), and adds that directory to your user PATH. Open a **new** terminal afterward.
 
