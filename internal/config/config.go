@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/RovierrHQ/envy/internal/fsutil"
 )
@@ -52,6 +53,44 @@ func (c *Config) EnvFile(env string) (string, error) {
 		return "", fmt.Errorf("config: unknown env %q", env)
 	}
 	return f, nil
+}
+
+// EnvNames returns sorted environment keys from Files.
+func (c *Config) EnvNames() []string {
+	if c.Files == nil {
+		return nil
+	}
+	names := make([]string, 0, len(c.Files))
+	for k := range c.Files {
+		names = append(names, k)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// HasPath reports whether path is already a value in Files.
+func (c *Config) HasPath(path string) bool {
+	if c.Files == nil {
+		return false
+	}
+	for _, p := range c.Files {
+		if p == path {
+			return true
+		}
+	}
+	return false
+}
+
+// AddFile sets Files[env]=path. Returns false if env already maps to a different path.
+func (c *Config) AddFile(env, path string) bool {
+	if c.Files == nil {
+		c.Files = map[string]string{}
+	}
+	if existing, ok := c.Files[env]; ok && existing != "" && existing != path {
+		return false
+	}
+	c.Files[env] = path
+	return true
 }
 
 func FindRoot(start string) (string, error) {
