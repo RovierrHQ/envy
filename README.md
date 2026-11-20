@@ -85,13 +85,15 @@ envy login
 envy init
 
 printf 'FOO=hello\nBAR=world\n' > .env
-envy push --env dev
+envy push
 
 envy invite create --role write
 # share the invite code + project passphrase out-of-band (e.g. 1Password)
 ```
 
 `envy init` defaults `api_url` to the hosted API and registers a project. Use `--backend=mock` only for offline tests.
+
+Bare `envy push` discovers new root `.env` / `.env.*` files (skips `.env.example` and similar), merges them into `.envy.json` `files`, and uploads only envs whose local content changed since the last push. Pass `--env <name>` to target one slot. Bare `envy pull` syncs every mapped env and skips ones already up to date.
 
 Teammate:
 
@@ -101,7 +103,7 @@ envy login
 envy invite accept <code>
 # clone the repo (committed .envy.json), then:
 envy unlock
-envy pull --env dev
+envy pull
 ```
 
 Store the passphrase out-of-band. If it is lost and no teammate still has the derived key in their OS keyring, remote ciphertext cannot be decrypted.
@@ -112,7 +114,7 @@ Store the passphrase out-of-band. If it is lost and no teammate still has the de
 - **Verifier:** A BLAKE2b-256 of the derived key lives in `.envy.json` so a wrong passphrase fails locally before any network call.
 - **Envelope:** Ciphertext is `envy1 || nonce || AES-256-GCM(ciphertext+tag)`, base64-encoded in the API payload.
 - **Zero-knowledge server:** Only `{ "ciphertext", "version" }` is stored. Salt and KDF parameters never leave the repo config.
-- **Environments:** Named envs (`dev`, `staging`, `prod`) map to local files via `.envy.json` `files`. Optimistic concurrency rejects stale pushes.
+- **Environments:** Named envs map to local files via `.envy.json` `files` (defaults: `dev`→`.env`, `staging`→`.env.staging`, `prod`→`.env.production`). Push auto-registers new root `.env*` paths. Optimistic concurrency rejects stale pushes.
 
 `.envy.json` is committed. `.envy/state.json` (local version + content hash) is not.
 
@@ -124,8 +126,8 @@ Store the passphrase out-of-band. If it is lost and no teammate still has the de
 | `envy login` | Device login, or `envy login --token` with a PAT from `/settings/tokens` |
 | `envy logout` | Remove the API token from the OS keyring |
 | `envy unlock` | Derive project key from passphrase into the OS keyring |
-| `envy push --env <name>` | Encrypt local file and upload |
-| `envy pull --env <name>` | Download, decrypt, atomic write (use `--force` if dirty) |
+| `envy push` | Discover `.env*`, encrypt and upload dirty envs (or `--env <name>` for one) |
+| `envy pull` | Download dirty envs and atomic-write (or `--env <name>`; `--force` if dirty) |
 | `envy invite create --role read\|write` | Owner mints a 48h single-use invite |
 | `envy invite accept <code>` | Join a project (login first) |
 | `envy version` | Print CLI version |
@@ -152,8 +154,8 @@ Offline mock backend:
 
 ```bash
 envy --backend=mock init
-envy --backend=mock push --env dev
-envy --backend=mock pull --env dev
+envy --backend=mock push
+envy --backend=mock pull
 ```
 
 ```bash
